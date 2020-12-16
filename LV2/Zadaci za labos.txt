@@ -1,0 +1,45 @@
+CREATE TABLE StiglecMislav(
+		ime NVARCHAR(50) NOT NULL,
+		prezime NVARCHAR(50) NOT NULL,
+		JMBG CHAR(13),
+		ROW INT IDENTITY(1,1) NOT NULL UNIQUE,
+		datum_rodenja SMALLDATETIME,
+		spol CHAR(1) NOT NULL,
+		visina SMALLINT,
+		slika IMAGE,
+		broj_cipela SMALLINT,
+		CONSTRAINT jmbgMISLAV_pk PRIMARY KEY(JMBG),
+		CONSTRAINT spolMISLAV_chk CHECK(spol in('M','Z')),
+		CONSTRAINT visinaMISLAV_chk CHECK(visina>0),
+		CONSTRAINT broj_cipelaMISLAV_chk CHECK(broj_cipela>0),
+		CONSTRAINT jmbg_chk CHECK(LEN(jmbg)=13)
+)
+
+
+INSERT INTO StiglecMislav VALUES('Mislav','Stiglec','1234567890123',1999-17-05,'M','192',NULL,'41');
+INSERT INTO StiglecMislav VALUES ('Pero','Peric','1234567890321',1995-22-08,'M','162',NULL,'39');
+INSERT INTO StiglecMislav VALUES ('Lovro','Lovric','1234567890222',1996-12-11,'M','152',NULL,'37');
+INSERT INTO StiglecMislav VALUES ('Ana','Ancic','1234567890333',1994-11-05,'M','172',NULL,'42');
+INSERT INTO StiglecMislav VALUES ('Mario','Marcic','1234567890442',1993-22-07,'M','167',NULL,'45');
+
+//treba nac kako dohvatit 2 red bez hardcoda
+
+UPDATE StiglecMislav SET ime='novoime',prezime='novoprezime' WHERE ROW=2
+
+UPDATE StiglecMislav SET broj_cipela=broj_cipela+2
+
+DELETE FROM StiglecMislav  WHERE ROW=3
+
+
+
+SELECT * FROM student ORDER BY datUpis DESC --3
+
+SELECT s.ime,s.prezime,s.datRod  
+FROM student AS s 
+WHERE datRod<'01/01/1978' 
+ORDER BY s.prezime ASC
+
+
+SELECT s.ime,s.prezime,p.naziv   --4
+FROM student AS s,predmet AS p,ispit AS i
+WHERE s.mbr=i.mbrStud AND p.sifra=i.sifPredmeta AND i.ocjena>=4
