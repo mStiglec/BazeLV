@@ -16,6 +16,7 @@ namespace BazePodatakaLV5
 
         private String name;
         private String surname;
+        private String oib;
         private String birthDate;
 
         public Form1()
@@ -28,7 +29,10 @@ namespace BazePodatakaLV5
         {
 
         }
-
+        private void tbOIB_TextChanged(object sender, EventArgs e)
+        {
+            this.oib = tbOIB.Text;
+        }
         private void tvName_TextChanged(object sender, EventArgs e)
         {
            this.name = tvName.Text;
@@ -36,15 +40,6 @@ namespace BazePodatakaLV5
         private void tvSurname_TextChanged(object sender, EventArgs e)
         {
             this.surname = tvSurname.Text;
-        }
-
-        private void rbtnFemale_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-        private void rbtnMale_CheckedChanged(object sender, EventArgs e)
-        {
-
         }
 
         private void btnExit_Click(object sender, EventArgs e)
@@ -56,17 +51,26 @@ namespace BazePodatakaLV5
             this.birthDate = dtpBirthDate.Value.ToString();
         }
 
+        private void btnShowAll_Click(object sender, EventArgs e)
+        {
+            SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-ODT1EBT\SQLEXPRESS;Initial Catalog=stuslu;Integrated Security=True");
+            conn.Open();
+
+            string statement;
+            statement = "SELECT * FROM student";
+     
+            SqlDataAdapter dataAdapter = new SqlDataAdapter(statement, conn);
+            DataTable dt = new DataTable();
+
+            dataAdapter.Fill(dt);
+            dgvData.DataSource = dt;
+
+            conn.Close();
+        }
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            getData();
-            //getStudentsBySurname();
-            //addStudent();
-        }
-
-        private void getData()
-        {
-            SqlConnection conn = new SqlConnection(@"Data Source=localhost\SQLEXPRESS;Initial Catalog=student;Integrated Security=True");
+            SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-ODT1EBT\SQLEXPRESS;Initial Catalog=stuslu;Integrated Security=True");
             conn.Open();
             string statement;
             StringBuilder builder = new StringBuilder();
@@ -75,22 +79,23 @@ namespace BazePodatakaLV5
             if (rbtnFemale.Checked)
             {
                 flag = true;
-                builder.Append("WHERE s.gender='F'");
-            }else if (rbtnMale.Checked)
+                builder.Append("WHERE s.spol='F'");
+            }
+            else if (rbtnMale.Checked)
             {
                 flag = true;
-                builder.Append("WHERE s.gender='M'");
+                builder.Append("WHERE s.spol='M'");
             }
             if (!String.IsNullOrEmpty(name))
             {
                 if (flag == true)
                 {
-                    builder.Append(" AND s.studentName='" + name + "'");
+                    builder.Append(" AND s.ime='" + name + "'");
                 }
                 else
                 {
                     flag = true;
-                    builder.Append("WHERE s.studentName='" + name + "'");
+                    builder.Append("WHERE s.ime='" + name + "'");
                 }
 
             }
@@ -98,11 +103,11 @@ namespace BazePodatakaLV5
             {
                 if (flag == true)
                 {
-                    builder.Append(" AND s.studentSurname='" + surname + "'");
+                    builder.Append(" AND s.prezime='" + surname + "'");
                 }
                 else
                 {
-                    builder.Append("WHERE s.studentSurname='" + surname + "'");
+                    builder.Append("WHERE s.prezime='" + surname + "'");
                 }
 
             }
@@ -116,26 +121,17 @@ namespace BazePodatakaLV5
 
         }
 
-        private void getStudentsBySurname()
+        private void btnInsert_Click(object sender, EventArgs e)
         {
-            SqlConnection connection=new SqlConnection(@"Data Source=localhost\SQLEXPRESS;Initial Catalog=student;Integrated Security=True");
-            connection.Open();
-            string statement = "SELECT * FROM student AS s ORDER BY s.studentSurname ASC";
-            SqlDataAdapter adapter = new SqlDataAdapter(statement,connection);
-            DataTable dt = new DataTable();
-            adapter.Fill(dt);
-            dgvData.DataSource = dt;
-            connection.Close();
-
-        }
-
-        private void addStudent()
-        {
-            SqlConnection connection = new SqlConnection(@"Data Source=localhost\SQLEXPRESS;Initial Catalog=student;Integrated Security=True");
+            SqlConnection connection = new SqlConnection(@"Data Source=DESKTOP-ODT1EBT\SQLEXPRESS;Initial Catalog=stuslu;Integrated Security=True");
             connection.Open();
             StringBuilder builder = new StringBuilder();
-            builder.Append("INSERT INTO student(studentID,studentName,studentSurname,dateOfBirth,gender) VALUES('0101010101',");
-           
+            builder.Append("INSERT INTO student(mbr,ime,prezime,datRod,spol) VALUES(");
+            if (!String.IsNullOrEmpty(tbOIB.Text))
+            {
+                builder.Append("'" + oib + "',");
+            }
+
             if (!String.IsNullOrEmpty(tvName.Text))
             {
                 builder.Append("'" + name + "',");
@@ -144,7 +140,7 @@ namespace BazePodatakaLV5
             {
                 builder.Append("'" + surname + "',");
             }
-            builder.Append("'" + dtpBirthDate.Value.Year + "." + dtpBirthDate.Value.Month + "." +dtpBirthDate.Value.Day + "',");
+            builder.Append("'" + dtpBirthDate.Value.Year + "." + dtpBirthDate.Value.Month + "." + dtpBirthDate.Value.Day + "',");
             if (rbtnMale.Checked)
             {
                 builder.Append("'M')");
@@ -160,31 +156,19 @@ namespace BazePodatakaLV5
             connection.Close();
 
         }
-        private void insertData()
+
+        private void btnSearchBySurname_Click(object sender, EventArgs e)
         {
-            SqlConnection conn = new SqlConnection(@"Data Source=localhost\SQLEXPRESS;Initial Catalog=student;Integrated Security=True");
-            conn.Open();
-            string statement;
-            statement = "INSERT INTO city VALUES('55556','Osijek')";
-            //statement = "UPDATE osobe SET ime='Perica' WHERE OIB='98765432109'";
-            SqlCommand cmd = new SqlCommand(statement, conn);
-            cmd.ExecuteNonQuery();
-            conn.Close();
+            SqlConnection connection = new SqlConnection(@"Data Source=DESKTOP-ODT1EBT\SQLEXPRESS;Initial Catalog=stuslu;Integrated Security=True");
+            connection.Open();
+            string statement = "SELECT * FROM student AS s ORDER BY s.prezime ASC";
+            SqlDataAdapter adapter = new SqlDataAdapter(statement, connection);
+            DataTable dt = new DataTable();
+            adapter.Fill(dt);
+            dgvData.DataSource = dt;
+            connection.Close();
         }
 
-        private void updateData()
-        {
-            SqlConnection conn = new SqlConnection(@"Data Source=localhost\SQLEXPRESS;Initial Catalog=student;Integrated Security=True");
-            conn.Open();
-            string statement;
-            statement = "UPDATE city SET cityName='Zagreb' WHERE cityName='Osijek'";
-            //statement = "UPDATE osobe SET ime='Perica' WHERE OIB='98765432109'";
-            SqlCommand cmd = new SqlCommand(statement, conn);
-            cmd.ExecuteNonQuery();
-            conn.Close();
-        }
-
-       
     }
 
 }
